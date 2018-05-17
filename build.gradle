@@ -1,5 +1,10 @@
 apply from: "GradleCommon/common.gradle"
 
+apply plugin: "application"
+
+mainClassName = "dev.aura.smartchatfilter.Main"
+ext.runDir = "run"
+
 repositories {
     // Additional repositories
 }
@@ -9,4 +14,41 @@ dependencies {
 
     compile "org.deeplearning4j:deeplearning4j-core:${d4j_version}"
     compile "org.deeplearning4j:deeplearning4j-parallel-wrapper_2.11:${d4j_version}"
+}
+
+jar {
+    classifier = null
+
+    manifest {
+        attributes(
+            "Specification-Title": pluginName,
+            "Specification-Version": version,
+            "Specification-Vendor": "Aura Development Team",
+            "Implementation-Title": pluginName,
+            "Implementation-Version": version,
+            "Implementation-Vendor": "Aura Development Team",
+            "Main-Class": mainClassName
+        )
+    }
+}
+
+test {
+    workingDir = runDir
+    systemProperty "log4j.skipJansi", "true"
+
+    doFirst {
+        file(workingDir).mkdirs()
+    }
+}
+
+run {
+    workingDir = runDir
+
+    if(project.hasProperty("args")) {
+        args project.args.split()
+    }
+
+    doFirst {
+        file(workingDir).mkdirs()
+    }
 }
