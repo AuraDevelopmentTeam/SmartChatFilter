@@ -5,5 +5,8 @@ repositories {
 }
 
 dependencies {
-    // Additional dependencies
+    compile "org.nd4j:nd4j-native-platform:${nd4j_version}"
+
+    compile "org.deeplearning4j:deeplearning4j-core:${d4j_version}"
+    compile "org.deeplearning4j:deeplearning4j-parallel-wrapper_2.11:${d4j_version}"
 }
