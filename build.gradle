@@ -1,3 +1,7 @@
+plugins {
+    id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
+}
+
 apply from: "GradleCommon/common.gradle"
 
 apply plugin: "application"
