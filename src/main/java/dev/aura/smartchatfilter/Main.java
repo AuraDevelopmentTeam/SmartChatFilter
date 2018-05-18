@@ -221,22 +221,6 @@ public class Main {
     System.exit(returnStatus);
   }
 
-  protected static void shutdown() {
-    logger.debug("Starting shutdown routine");
-
-    if (networkTrainer != null) {
-      networkTrainer.stop();
-    }
-
-    if (returnStatus == 0) {
-      logger.info("Application stopped.");
-    } else {
-      logger.warn("Application stopped with exit value {}.", returnStatus);
-    }
-
-    LogManager.shutdown();
-  }
-
   protected static void main(CommandLine commandLine) throws IOException {
     try {
       logger.info("Starting " + NAME + " v" + VERSION);
@@ -252,6 +236,22 @@ public class Main {
 
       setReturnStatus(1);
     }
+  }
+
+  protected static void shutdown() {
+    logger.debug("Starting shutdown routine");
+
+    if (networkTrainer != null) {
+      networkTrainer.stop();
+    }
+
+    if (returnStatus == 0) {
+      logger.info("Application stopped.");
+    } else {
+      logger.warn("Application stopped with exit value {}.", returnStatus);
+    }
+
+    LogManager.shutdown();
   }
 
   public static void stop() {
