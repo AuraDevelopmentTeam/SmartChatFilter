@@ -13,19 +13,19 @@ import org.deeplearning4j.optimize.api.IterationListener;
 @ToString
 @EqualsAndHashCode
 @Log4j2
-public class DebugScoreIterationListener implements IterationListener {
+public class AdvancedScoreIterationListener implements IterationListener {
   private static final long serialVersionUID = 825622518505976747L;
 
   private final int infoIterations;
   private final int debugIterations;
 
   @Generated
-  public DebugScoreIterationListener(int infoIterations) {
+  public AdvancedScoreIterationListener(int infoIterations) {
     this(infoIterations, 1);
   }
 
   @Generated
-  public DebugScoreIterationListener() {
+  public AdvancedScoreIterationListener() {
     this(10);
   }
 

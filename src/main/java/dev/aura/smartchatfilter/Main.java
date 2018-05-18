@@ -1,6 +1,6 @@
 package dev.aura.smartchatfilter;
 
-import dev.aura.smartchatfilter.log.DebugScoreIterationListener;
+import dev.aura.smartchatfilter.log.AdvancedScoreIterationListener;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
@@ -63,7 +63,7 @@ public class Main {
     MultiLayerNetwork model = new MultiLayerNetwork(conf);
     model.init();
     //print the score with every 100 iteration (and every 10 to the log)
-    model.setListeners(new DebugScoreIterationListener(100, 10));
+    model.setListeners(new AdvancedScoreIterationListener(100, 10));
 
     log.info("Train model....");
     for (int i = 0; i < numEpochs; i++) {
