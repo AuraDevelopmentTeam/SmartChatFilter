@@ -1,3 +1,6 @@
+import groovy.json.StringEscapeUtils
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
 }
@@ -8,6 +11,7 @@ apply plugin: "application"
 
 mainClassName = "dev.aura.smartchatfilter.Main"
 ext.runDir = "run"
+def licenseHeader = file("LICENSE_HEADER.txt")
 
 repositories {
     // Additional repositories
@@ -33,6 +37,18 @@ dependencies {
 
     // Misc
     compile "commons-cli:commons-cli:${commonsCLI_version}"
+}
+
+spotless.java {
+    licenseHeaderFile licenseHeader
+}
+
+processSources {
+    filteringCharset = "UTF-8"
+
+    filter (ReplaceTokens, tokens: [
+        "license": StringEscapeUtils.escapeJava(licenseHeader.text.replaceAll("^/\\*\\n| \\*(?: |/)?", ""))
+    ])
 }
 
 jar {
