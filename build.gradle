@@ -14,6 +14,13 @@ repositories {
 }
 
 dependencies {
+    // Log4J
+    compile "com.lmax:disruptor:${disruptor_version}"
+    compile "commons-cli:commons-cli:${commonsCLI_version}"
+    compile "org.apache.logging.log4j:log4j-core:${log4j_version}"
+    compile "org.fusesource.jansi:jansi:${jansi_version}"
+
+    // DeepLearning4J
     compile "org.nd4j:nd4j-native-platform:${nd4j_version}"
 
     compile "org.deeplearning4j:deeplearning4j-core:${d4j_version}"
