@@ -217,6 +217,7 @@ public class Main {
     }
 
     shutdown();
+    LogManager.shutdown();
 
     System.exit(returnStatus);
   }
@@ -250,8 +251,6 @@ public class Main {
     } else {
       logger.warn("Application stopped with exit value {}.", returnStatus);
     }
-
-    LogManager.shutdown();
   }
 
   public static void stop() {
