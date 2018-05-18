@@ -16,18 +16,23 @@ repositories {
 dependencies {
     // Log4J
     compile "com.lmax:disruptor:${disruptor_version}"
-    compile "commons-cli:commons-cli:${commonsCLI_version}"
     compile "org.apache.logging.log4j:log4j-core:${log4j_version}"
+    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
     compile "org.fusesource.jansi:jansi:${jansi_version}"
 
     // DeepLearning4J
     compile "org.nd4j:nd4j-native-platform:${nd4j_version}"
 
     compile "org.deeplearning4j:deeplearning4j-core:${d4j_version}"
-    compile "org.deeplearning4j:deeplearning4j-parallel-wrapper_2.11:${d4j_version}"
+    compile("org.deeplearning4j:deeplearning4j-parallel-wrapper_2.11:${d4j_version}") {
+        exclude group: "ch.qos.logback"
+    }
     compile "org.deeplearning4j:deeplearning4j-data:${d4j_version}"
 
     compile "org.deeplearning4j:arbiter-deeplearning4j:${arbiter_version}"
+
+    // Misc
+    compile "commons-cli:commons-cli:${commonsCLI_version}"
 }
 
 jar {

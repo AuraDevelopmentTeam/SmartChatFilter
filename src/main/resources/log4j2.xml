@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" packages="de.project_creative.arrestia.dev_bot">
+<Configuration status="WARN" packages="dev.aura.smartchatfilter">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout>
@@ -21,9 +21,7 @@
   <Loggers>
     <AsyncRoot level="debug" includeLocation="true">
       <AppenderRef ref="File"/>
+      <AppenderRef ref="Console" level="info"/>
     </AsyncRoot>
-    <AsyncLogger name="de.project_creative.arrestia.dev_bot" level="info" includeLocation="true">
-      <AppenderRef ref="Console"/>
-    </AsyncLogger>
   </Loggers>
 </Configuration>
