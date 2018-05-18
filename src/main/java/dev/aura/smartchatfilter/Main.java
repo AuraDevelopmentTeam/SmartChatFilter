@@ -233,17 +233,20 @@ public class Main {
     } else {
       logger.warn("Application stopped with exit value {}.", returnStatus);
     }
+
+    LogManager.shutdown();
   }
 
   protected static void main(CommandLine commandLine) throws IOException {
     try {
       logger.info("Starting " + NAME + " v" + VERSION);
 
+      networkTrainer = new NetworkTrainer();
       networkTrainer.start();
 
       block();
     } catch (RuntimeException e) {
-      logger.error("Error during startup: " + e.getMessage());
+      logger.error("Error during startup: {}", e.getMessage());
       logger.debug("Detailed error:", e);
       logger.info("Check your settings!");
 
