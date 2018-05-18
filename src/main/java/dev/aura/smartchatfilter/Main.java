@@ -1,5 +1,6 @@
 package dev.aura.smartchatfilter;
 
+import dev.aura.smartchatfilter.log.DebugScoreIterationListener;
 import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
@@ -9,7 +10,6 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -26,7 +26,7 @@ public class Main {
     int outputNum = 10; // number of output classes
     int batchSize = 128; // batch size for each epoch
     int rngSeed = 123; // random number seed for reproducibility
-    int numEpochs = 15; // number of epochs to perform
+    int numEpochs = 100; // number of epochs to perform
 
     //Get the DataSetIterators:
     DataSetIterator mnistTrain = new MnistDataSetIterator(batchSize, true, rngSeed);
@@ -62,8 +62,8 @@ public class Main {
 
     MultiLayerNetwork model = new MultiLayerNetwork(conf);
     model.init();
-    //print the score with every 1 iteration
-    model.setListeners(new ScoreIterationListener(1));
+    //print the score with every 100 iteration (and every 10 to the log)
+    model.setListeners(new DebugScoreIterationListener(100, 10));
 
     log.info("Train model....");
     for (int i = 0; i < numEpochs; i++) {
