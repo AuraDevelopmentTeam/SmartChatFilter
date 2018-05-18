@@ -27,6 +27,10 @@ import java.io.PrintWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
@@ -40,7 +44,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 
 @UtilityClass
 @Log4j2
@@ -83,16 +89,38 @@ public class Main {
     return new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
   }
 
+  private static void updateAppenderRefs(
+      Stream<LoggerConfig> configs, Level oldLevel, Level newLevel) {
+    configs
+        .map(LoggerConfig::getAppenderRefs)
+        .forEach(
+            appenderRefList -> {
+              final List<AppenderRef> newAppenderRefs =
+                  appenderRefList
+                      .stream()
+                      .map(
+                          appenderRef ->
+                              (appenderRef.getLevel() == oldLevel)
+                                  ? AppenderRef.createAppenderRef(
+                                      appenderRef.getRef(), newLevel, appenderRef.getFilter())
+                                  : appenderRef)
+                      .collect(Collectors.toList());
+
+              appenderRefList.clear();
+              appenderRefList.addAll(newAppenderRefs);
+            });
+  }
+
   private static void enableTrace() {
     final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
     final Configuration config = ctx.getConfiguration();
+    final Collection<LoggerConfig> loggers = config.getLoggers().values();
 
-    config
-        .getLoggers()
-        .values()
+    loggers
         .stream()
         .filter(logger -> logger.getLevel() == Level.DEBUG)
         .forEach(logger -> logger.setLevel(Level.TRACE));
+    updateAppenderRefs(loggers.stream(), Level.DEBUG, Level.TRACE);
 
     ctx.updateLoggers();
   }
@@ -100,13 +128,14 @@ public class Main {
   private static void enableVerbose(final boolean debug) {
     final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
     final Configuration config = ctx.getConfiguration();
+    final Collection<LoggerConfig> loggers = config.getLoggers().values();
+    final Level level = debug ? Level.TRACE : Level.DEBUG;
 
-    config
-        .getLoggers()
-        .values()
+    loggers
         .stream()
         .filter(logger -> logger.getLevel() == Level.INFO)
-        .forEach(logger -> logger.setLevel(debug ? Level.TRACE : Level.DEBUG));
+        .forEach(logger -> logger.setLevel(level));
+    updateAppenderRefs(loggers.stream(), Level.INFO, level);
 
     ctx.updateLoggers();
   }
