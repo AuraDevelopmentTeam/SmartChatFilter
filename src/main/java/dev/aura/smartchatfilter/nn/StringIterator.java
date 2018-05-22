@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,10 @@ public class StringIterator implements DataSetIterator {
     }
   }
 
+  public StringIterator(String message, MessageRating rating) {
+    this(Collections.singletonMap(message, rating), 1);
+  }
+
   public StringIterator(Map<String, MessageRating> messages) {
     this(messages, DEFAULT_BATCH_SIZE);
   }
@@ -85,7 +90,7 @@ public class StringIterator implements DataSetIterator {
             .mapToInt(bytes -> bytes.length)
             .max()
             .getAsInt();
-    this.miniBatchSize = miniBatchSize;
+    this.miniBatchSize = Math.min(miniBatchSize, messagesCount);
 
     reset();
   }
@@ -105,21 +110,24 @@ public class StringIterator implements DataSetIterator {
     final int examplesCount = Math.min(num, messagesCount - cursor);
     cursor += examplesCount;
 
-    final int[] dimensions = new int[] {examplesCount, CHARACTER_COUNT, maxLength};
-    final INDArray input = Nd4j.create(dimensions, 'f');
-    final INDArray output = Nd4j.create(dimensions, 'f');
-    final INDArray inputMask = Nd4j.create(dimensions, 'f');
-    final INDArray outputMask = Nd4j.create(dimensions, 'f');
+    final int[] inputDimensions = new int[] {examplesCount, CHARACTER_COUNT, maxLength};
+    final int[] outputDimensions = new int[] {examplesCount, MessageRating.SCORES_COUNT, maxLength};
+    final INDArray input = Nd4j.create(inputDimensions, 'f');
+    final INDArray output = Nd4j.create(outputDimensions, 'f');
+    final INDArray inputMask = Nd4j.create(inputDimensions, 'f');
+    final INDArray outputMask = Nd4j.create(outputDimensions, 'f');
 
     Map.Entry<byte[], MessageRating> entry;
     byte[] string;
     int stringLength;
+    int lastIndex;
     MessageRating rating;
 
     for (int i = 0; i < examplesCount; ++i) {
       entry = iterator.next();
       string = entry.getKey();
       stringLength = string.length;
+      lastIndex = stringLength - 1;
       rating = entry.getValue();
 
       for (int pos = 0; pos < stringLength; ++pos) {
@@ -127,10 +135,12 @@ public class StringIterator implements DataSetIterator {
         fillMaskRow(inputMask, i, pos);
       }
 
-      output.putScalar(new int[] {i, 0, stringLength - 1}, rating.getSpam());
-      output.putScalar(new int[] {i, 1, stringLength - 1}, rating.getSwearing());
-      output.putScalar(new int[] {i, 2, stringLength - 1}, rating.getInsulting());
-      fillMaskRow(outputMask, i, stringLength - 1);
+      output.putScalar(new int[] {i, 0, lastIndex}, rating.getSpam());
+      output.putScalar(new int[] {i, 1, lastIndex}, rating.getSwearing());
+      output.putScalar(new int[] {i, 2, lastIndex}, rating.getInsulting());
+      outputMask.putScalar(new int[] {i, 0, lastIndex}, 1.0);
+      outputMask.putScalar(new int[] {i, 1, lastIndex}, 1.0);
+      outputMask.putScalar(new int[] {i, 2, lastIndex}, 1.0);
     }
 
     return new DataSet(input, output, inputMask, outputMask);
