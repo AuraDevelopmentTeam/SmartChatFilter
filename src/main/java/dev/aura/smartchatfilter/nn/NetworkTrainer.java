@@ -79,7 +79,7 @@ public class NetworkTrainer {
     final int nChannels = 1; // Number of input channels
     final int outputNum = 10; // The number of possible outcomes
     final int batchSize = 64; // Test batch size
-    final int nEpochs = 10; // Number of training epochs
+    final int nEpochs = 100; // Number of training epochs
     final int seed = 123; //
 
     /*
@@ -99,10 +99,14 @@ public class NetworkTrainer {
     lrSchedule.put(0, 0.01);
     lrSchedule.put(1000, 0.005);
     lrSchedule.put(3000, 0.001);
+    lrSchedule.put(10000, 0.0005);
+    lrSchedule.put(30000, 0.0001);
     final Map<Integer, Double> mvSchedule = new HashMap<>();
     mvSchedule.put(0, 0.9);
     mvSchedule.put(1000, 0.8);
     mvSchedule.put(3000, 0.7);
+    mvSchedule.put(10000, 0.6);
+    mvSchedule.put(30000, 0.5);
 
     final MultiLayerConfiguration conf =
         new NeuralNetConfiguration.Builder()
