@@ -56,6 +56,11 @@ public class Network {
   }
 
   public void saveToFile(File saveFile) throws IOException {
+    final File parent = saveFile.getParentFile();
+
+    if (!parent.exists() && !parent.mkdirs())
+      throw new IOException("Could not create directory: " + parent);
+
     ModelSerializer.writeModel(network, saveFile, true);
   }
 

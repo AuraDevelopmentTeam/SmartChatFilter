@@ -19,6 +19,8 @@ package dev.aura.smartchatfilter.nn;
 
 import dev.aura.smartchatfilter.nn.rating.MessageRating;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +38,7 @@ public class StringIterator implements DataSetIterator {
   public static final int CHARACTER_COUNT = 1 << 8;
   private static final int DEFAULT_BATCH_SIZE = 64;
 
-  private final Collection<Map.Entry<byte[], MessageRating>> originalMessages;
+  private final ArrayList<Map.Entry<byte[], MessageRating>> originalMessages;
   private final int messagesCount;
   private final int maxLength;
   private final int miniBatchSize;
@@ -70,10 +72,11 @@ public class StringIterator implements DataSetIterator {
     originalMessages =
         messages
             .stream()
-            .collect(
-                Collectors.toMap(
-                    entry -> entry.getKey().getBytes(StandardCharsets.UTF_8), Map.Entry::getValue))
-            .entrySet();
+            .map(
+                entry ->
+                    new AbstractMap.SimpleEntry<>(
+                        entry.getKey().getBytes(StandardCharsets.UTF_8), entry.getValue()))
+            .collect(Collectors.toCollection(ArrayList::new));
     messagesCount = messages.size();
     maxLength =
         originalMessages
