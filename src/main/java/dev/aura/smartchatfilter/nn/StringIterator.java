@@ -34,10 +34,12 @@ public class StringIterator implements DataSetIterator {
   private static final long serialVersionUID = 8184624800313752541L;
 
   public static final int CHARACTER_COUNT = 1 << 8;
+  private static final int DEFAULT_BATCH_SIZE = 64;
 
   private final Collection<Map.Entry<byte[], MessageRating>> originalMessages;
   private final int messagesCount;
   private final int maxLength;
+  private final int miniBatchSize;
 
   private Iterator<Map.Entry<byte[], MessageRating>> iterator;
   private int cursor;
@@ -53,10 +55,18 @@ public class StringIterator implements DataSetIterator {
   }
 
   public StringIterator(Map<String, MessageRating> messages) {
-    this(messages.entrySet());
+    this(messages, DEFAULT_BATCH_SIZE);
+  }
+
+  public StringIterator(Map<String, MessageRating> messages, int miniBatchSize) {
+    this(messages.entrySet(), miniBatchSize);
   }
 
   public StringIterator(Collection<Map.Entry<String, MessageRating>> messages) {
+    this(messages, DEFAULT_BATCH_SIZE);
+  }
+
+  public StringIterator(Collection<Map.Entry<String, MessageRating>> messages, int miniBatchSize) {
     originalMessages =
         messages
             .stream()
@@ -72,6 +82,7 @@ public class StringIterator implements DataSetIterator {
             .mapToInt(bytes -> bytes.length)
             .max()
             .getAsInt();
+    this.miniBatchSize = miniBatchSize;
 
     reset();
   }
@@ -83,7 +94,7 @@ public class StringIterator implements DataSetIterator {
 
   @Override
   public DataSet next() {
-    return next(1);
+    return next(miniBatchSize);
   }
 
   @Override
