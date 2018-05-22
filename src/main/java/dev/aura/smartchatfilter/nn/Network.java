@@ -20,6 +20,7 @@ package dev.aura.smartchatfilter.nn;
 import dev.aura.smartchatfilter.nn.rating.MessageRating;
 import java.io.File;
 import java.io.IOException;
+import lombok.extern.log4j.Log4j2;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -29,11 +30,13 @@ import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.learning.config.RmsProp;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
+@Log4j2
 public class Network {
-  private static final int hiddenLayerCount = 10_000;
+  private static final int hiddenLayerCount = 1_000;
   private static final int backDropLength = 100;
 
   private final MultiLayerNetwork network;
@@ -64,8 +67,16 @@ public class Network {
     ModelSerializer.writeModel(network, saveFile, true);
   }
 
-  public void evaluateString(String text) {
-    // TODO
+  public MessageRating evaluateString(String text) {
+    Object temp = network.output(new StringIterator(text, new MessageRating(0, 0, 0)));
+
+    logger.info(temp.toString());
+
+    return new MessageRating(0, 0, 0);
+  }
+
+  public void train(DataSetIterator iterator) {
+    network.fit(iterator);
   }
 
   private MultiLayerConfiguration getConfiguration() {
