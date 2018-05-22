@@ -51,12 +51,6 @@ public class StringIterator implements DataSetIterator {
     return val & 0xFF;
   }
 
-  private static void fillMaskRow(INDArray mask, int batch, int timeStep) {
-    for (int i = 0; i < CHARACTER_COUNT; ++i) {
-      mask.putScalar(new int[] {batch, i, timeStep}, 1.0);
-    }
-  }
-
   public StringIterator(String message, MessageRating rating) {
     this(Collections.singletonMap(message, rating), 1);
   }
@@ -110,12 +104,11 @@ public class StringIterator implements DataSetIterator {
     final int examplesCount = Math.min(num, messagesCount - cursor);
     cursor += examplesCount;
 
-    final int[] inputDimensions = new int[] {examplesCount, CHARACTER_COUNT, maxLength};
-    final int[] outputDimensions = new int[] {examplesCount, MessageRating.SCORES_COUNT, maxLength};
-    final INDArray input = Nd4j.create(inputDimensions, 'f');
-    final INDArray output = Nd4j.create(outputDimensions, 'f');
-    final INDArray inputMask = Nd4j.create(inputDimensions, 'f');
-    final INDArray outputMask = Nd4j.create(outputDimensions, 'f');
+    final INDArray input = Nd4j.create(new int[] {examplesCount, CHARACTER_COUNT, maxLength}, 'f');
+    final INDArray output =
+        Nd4j.create(new int[] {examplesCount, MessageRating.SCORES_COUNT, maxLength}, 'f');
+    final INDArray inputMask = Nd4j.create(new int[] {examplesCount, maxLength}, 'f');
+    final INDArray outputMask = Nd4j.create(new int[] {examplesCount, maxLength}, 'f');
 
     Map.Entry<byte[], MessageRating> entry;
     byte[] string;
@@ -132,15 +125,13 @@ public class StringIterator implements DataSetIterator {
 
       for (int pos = 0; pos < stringLength; ++pos) {
         input.putScalar(new int[] {i, getByteIndex(string[pos]), pos}, 1.0);
-        fillMaskRow(inputMask, i, pos);
+        inputMask.putScalar(new int[] {i, pos}, 1.0);
       }
 
       output.putScalar(new int[] {i, 0, lastIndex}, rating.getSpam());
       output.putScalar(new int[] {i, 1, lastIndex}, rating.getSwearing());
       output.putScalar(new int[] {i, 2, lastIndex}, rating.getInsulting());
-      outputMask.putScalar(new int[] {i, 0, lastIndex}, 1.0);
-      outputMask.putScalar(new int[] {i, 1, lastIndex}, 1.0);
-      outputMask.putScalar(new int[] {i, 2, lastIndex}, 1.0);
+      outputMask.putScalar(new int[] {i, lastIndex}, 1.0);
     }
 
     return new DataSet(input, output, inputMask, outputMask);
