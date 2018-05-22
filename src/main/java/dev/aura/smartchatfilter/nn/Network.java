@@ -17,6 +17,7 @@
  */
 package dev.aura.smartchatfilter.nn;
 
+import dev.aura.smartchatfilter.nn.rating.MessageRating;
 import java.io.File;
 import java.io.IOException;
 import org.deeplearning4j.nn.conf.BackpropType;
@@ -32,11 +33,10 @@ import org.nd4j.linalg.learning.config.RmsProp;
 import org.nd4j.linalg.lossfunctions.LossFunctions.LossFunction;
 
 public class Network {
-  private static final int scoresCount = 3;
-  private static final int hiddenLayerCount = 10000;
-  private static final int backDropLength = 10;
+  private static final int hiddenLayerCount = 10_000;
+  private static final int backDropLength = 100;
 
-  private MultiLayerNetwork network;
+  private final MultiLayerNetwork network;
 
   public static Network generateNew() {
     return new Network();
@@ -74,7 +74,7 @@ public class Network {
         .layer(
             0,
             new GravesLSTM.Builder()
-                .nIn(1)
+                .nIn(StringIterator.CHARACTER_COUNT)
                 .nOut(hiddenLayerCount)
                 .activation(Activation.TANH)
                 .build())
@@ -91,7 +91,7 @@ public class Network {
             new RnnOutputLayer.Builder(LossFunction.MCXENT)
                 .activation(Activation.SOFTMAX)
                 .nIn(hiddenLayerCount)
-                .nOut(scoresCount)
+                .nOut(MessageRating.SCORES_COUNT)
                 .build())
         .backpropType(BackpropType.TruncatedBPTT)
         .tBPTTForwardLength(backDropLength)
