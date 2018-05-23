@@ -17,10 +17,12 @@
  */
 package dev.aura.smartchatfilter.nn;
 
+import dev.aura.smartchatfilter.log.AdvancedScoreIterationListener;
 import dev.aura.smartchatfilter.nn.rating.MessageRating;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -46,12 +48,14 @@ public class Network {
   }
 
   public static Network loadFromFile(File saveFile) throws IOException {
-    return new Network(saveFile);
+    if (saveFile.exists()) return new Network(saveFile);
+    else return generateNew();
   }
 
   private Network() {
     network = new MultiLayerNetwork(getConfiguration());
     network.init();
+    network.setListeners(new AdvancedScoreIterationListener(100, 10));
   }
 
   private Network(File saveFile) throws IOException {
@@ -80,6 +84,10 @@ public class Network {
     network.fit(iterator);
   }
 
+  public Evaluation evaluate(DataSetIterator iterator) {
+    return network.evaluate(iterator);
+  }
+
   private MultiLayerConfiguration getConfiguration() {
     // TODO: Get this configuration right!
     return new NeuralNetConfiguration.Builder()
@@ -106,7 +114,7 @@ public class Network {
         .layer(
             2,
             new RnnOutputLayer.Builder(LossFunction.MCXENT)
-                .activation(Activation.SOFTMAX)
+                .activation(Activation.SIGMOID)
                 .nIn(hiddenLayerCount)
                 .nOut(MessageRating.SCORES_COUNT)
                 .build())
