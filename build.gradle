@@ -33,7 +33,9 @@ dependencies {
     }
     compile "org.deeplearning4j:deeplearning4j-data:${d4j_version}"
 
+    // Extra DeepLearning4J stuff
     compile "org.deeplearning4j:arbiter-deeplearning4j:${arbiter_version}"
+    compile "org.deeplearning4j:deeplearning4j-ui_2.11:${d4j_version}"
 
     // Misc
     compile "commons-cli:commons-cli:${commonsCLI_version}"

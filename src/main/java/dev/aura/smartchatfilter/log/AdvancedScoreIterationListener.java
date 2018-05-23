@@ -17,6 +17,8 @@
  */
 package dev.aura.smartchatfilter.log;
 
+import java.util.List;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Generated;
 import lombok.RequiredArgsConstructor;
@@ -24,15 +26,14 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.Level;
 import org.deeplearning4j.nn.api.Model;
-import org.deeplearning4j.optimize.api.IterationListener;
+import org.deeplearning4j.optimize.api.TrainingListener;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 @RequiredArgsConstructor
 @ToString
 @EqualsAndHashCode
 @Log4j2
-public class AdvancedScoreIterationListener implements IterationListener {
-  private static final long serialVersionUID = 825622518505976747L;
-
+public class AdvancedScoreIterationListener implements TrainingListener {
   private final int infoIterations;
   private final int debugIterations;
 
@@ -61,5 +62,35 @@ public class AdvancedScoreIterationListener implements IterationListener {
           epoch,
           score);
     }
+  }
+
+  @Override
+  public void onEpochStart(Model model) {
+    // Do nothing
+  }
+
+  @Override
+  public void onEpochEnd(Model model) {
+    // Do nothing
+  }
+
+  @Override
+  public void onForwardPass(Model model, List<INDArray> activations) {
+    // Do nothing
+  }
+
+  @Override
+  public void onForwardPass(Model model, Map<String, INDArray> activations) {
+    // Do nothing
+  }
+
+  @Override
+  public void onGradientCalculation(Model model) {
+    // Do nothing
+  }
+
+  @Override
+  public void onBackwardPass(Model model) {
+    // Do nothing
   }
 }

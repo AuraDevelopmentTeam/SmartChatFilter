@@ -22,14 +22,21 @@ import dev.aura.smartchatfilter.nn.rating.MessageRating;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.LinkedList;
+import org.deeplearning4j.api.storage.StatsStorage;
 import org.deeplearning4j.eval.Evaluation;
 import org.deeplearning4j.nn.conf.BackpropType;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.layers.GravesLSTM;
+import org.deeplearning4j.nn.conf.layers.LSTM;
 import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
+import org.deeplearning4j.optimize.api.TrainingListener;
+import org.deeplearning4j.ui.api.UIServer;
+import org.deeplearning4j.ui.stats.StatsListener;
+import org.deeplearning4j.ui.storage.InMemoryStatsStorage;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -88,6 +95,18 @@ public class Network {
     return network.evaluate(iterator);
   }
 
+  public void enableUI() {
+    final UIServer uiServer = UIServer.getInstance();
+    final StatsStorage statsStorage = new InMemoryStatsStorage();
+
+    uiServer.attach(statsStorage);
+
+    // network.addListeners is bugged
+    final Collection<TrainingListener> listeners = new LinkedList<>(network.getListeners());
+    listeners.add(new StatsListener(statsStorage));
+    network.setListeners(listeners);
+  }
+
   private MultiLayerConfiguration getConfiguration() {
     // TODO: Get this configuration right!
     return new NeuralNetConfiguration.Builder()
@@ -98,19 +117,18 @@ public class Network {
         .list()
         .layer(
             0,
-            new GravesLSTM.Builder()
+            new LSTM.Builder()
                 .nIn(StringIterator.CHARACTER_COUNT)
                 .nOut(hiddenLayerCount)
                 .activation(Activation.TANH)
                 .build())
         .layer(
             1,
-            new GravesLSTM.Builder()
+            new LSTM.Builder()
                 .nIn(hiddenLayerCount)
                 .nOut(hiddenLayerCount)
                 .activation(Activation.TANH)
                 .build())
-        //MCXENT + softmax for classification
         .layer(
             2,
             new RnnOutputLayer.Builder(LossFunction.MCXENT)

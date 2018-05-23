@@ -19,7 +19,7 @@ package dev.aura.smartchatfilter.log;
 
 import dev.aura.smartchatfilter.util.LogTests;
 import org.deeplearning4j.nn.api.Model;
-import org.deeplearning4j.optimize.api.IterationListener;
+import org.deeplearning4j.optimize.api.TrainingListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +41,7 @@ public class AdvancedScoreIterationListenerTest extends LogTests {
 
   @Test
   public void defaultListenerTest() {
-    final IterationListener listener = new AdvancedScoreIterationListener();
+    final TrainingListener listener = new AdvancedScoreIterationListener();
 
     for (int i = 0; i < 20; ++i) {
       listener.iterationDone(model, i, 20 - i);
@@ -73,7 +73,7 @@ public class AdvancedScoreIterationListenerTest extends LogTests {
 
   @Test
   public void customListenerTest() {
-    final IterationListener listener = new AdvancedScoreIterationListener(5, 2);
+    final TrainingListener listener = new AdvancedScoreIterationListener(5, 2);
 
     for (int i = 0; i < 20; ++i) {
       listener.iterationDone(model, i, 20 - i);

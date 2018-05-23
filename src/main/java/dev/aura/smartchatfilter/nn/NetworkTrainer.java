@@ -17,14 +17,17 @@
  */
 package dev.aura.smartchatfilter.nn;
 
+import com.google.common.collect.ImmutableMap;
 import dev.aura.smartchatfilter.Main;
 import dev.aura.smartchatfilter.nn.rating.MessageRating;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Random;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.deeplearning4j.eval.Evaluation;
+import org.apache.commons.lang3.RandomStringUtils;
 
 @Log4j2
 public class NetworkTrainer {
@@ -66,12 +69,22 @@ public class NetworkTrainer {
       logger.info("Load model....");
 
       network = Network.loadFromFile(saveLocation);
+      network.enableUI();
+
       logger.info(network.evaluateString("Test").toString());
       logger.info(network.evaluateString("Penis").toString());
 
       // Number of training epochs
       final int nEpochs = 100;
-      final StringIterator trainingData = new StringIterator("Test", new MessageRating(0, 0, 0));
+      final StringIterator trainingData =
+          new StringIterator(
+              ImmutableMap.<String, MessageRating>builder()
+                  .put("Test", new MessageRating(0, 0, 0))
+                  .put("Hallo", new MessageRating(0, 0, 0))
+                  .put("Penis", new MessageRating(0, .8, 0))
+                  .put("Bitch", new MessageRating(0, .9, .8))
+                  .putAll(getMap())
+                  .build());
       final StringIterator evaluationData = new StringIterator("Test", new MessageRating(0, 0, 0));
 
       logger.info("Train model....");
@@ -80,10 +93,10 @@ public class NetworkTrainer {
         network.train(trainingData);
         logger.info("*** Completed epoch {} ***", i);
 
-        logger.info("Evaluate model....");
-        Evaluation eval = network.evaluate(evaluationData);
-        logger.info(eval.stats());
-        evaluationData.reset();
+        // logger.info("Evaluate model....");
+        // Evaluation eval = network.evaluate(evaluationData);
+        // logger.info(eval.stats());
+        // evaluationData.reset();
       }
 
       logger.info("****************Training finished********************");
@@ -92,5 +105,19 @@ public class NetworkTrainer {
 
       Main.stop();
     }
+  }
+
+  private Map<String, MessageRating> getMap() {
+    final ImmutableMap.Builder<String, MessageRating> builder =
+        ImmutableMap.<String, MessageRating>builder();
+    final Random rand = new Random(12345);
+
+    for (int i = 0; i < 1000; ++i) {
+      builder.put(
+          RandomStringUtils.random(rand.nextInt(100) + 10, 0, 0, true, true, null, rand),
+          new MessageRating(rand.nextDouble(), rand.nextDouble(), rand.nextDouble()));
+    }
+
+    return builder.build();
   }
 }
