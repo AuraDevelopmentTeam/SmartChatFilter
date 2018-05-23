@@ -62,7 +62,7 @@ public class Network {
   private Network() {
     network = new MultiLayerNetwork(getConfiguration());
     network.init();
-    network.setListeners(new AdvancedScoreIterationListener(100, 10));
+    network.setListeners(new AdvancedScoreIterationListener(10, 5));
   }
 
   private Network(File saveFile) throws IOException {
@@ -103,7 +103,7 @@ public class Network {
 
     // network.addListeners is bugged
     final Collection<TrainingListener> listeners = new LinkedList<>(network.getListeners());
-    listeners.add(new StatsListener(statsStorage));
+    listeners.add(new StatsListener(statsStorage, 5));
     network.setListeners(listeners);
   }
 
