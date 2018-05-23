@@ -20,6 +20,7 @@ package dev.aura.smartchatfilter.nn;
 import com.google.common.collect.ImmutableMap;
 import dev.aura.smartchatfilter.Main;
 import dev.aura.smartchatfilter.nn.rating.MessageRating;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class NetworkTrainer {
                   .put("Bitch", new MessageRating(0, .9, .8))
                   .putAll(getMap())
                   .build());
-      final StringIterator evaluationData = new StringIterator("Test", new MessageRating(0, 0, 0));
+      //final StringIterator evaluationData = new StringIterator("Test", new MessageRating(0, 0, 0));
 
       logger.info("Train model....");
 
@@ -110,6 +111,10 @@ public class NetworkTrainer {
     }
   }
 
+  @SuppressFBWarnings(
+    value = "RV_RETURN_VALUE_IGNORED",
+    justification = "Builder#put returns the same builder for chaining."
+  )
   private Map<String, MessageRating> getMap() {
     final ImmutableMap.Builder<String, MessageRating> builder =
         ImmutableMap.<String, MessageRating>builder();
