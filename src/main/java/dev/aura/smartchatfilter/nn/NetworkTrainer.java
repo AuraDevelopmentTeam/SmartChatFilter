@@ -93,6 +93,9 @@ public class NetworkTrainer {
         network.train(trainingData);
         logger.info("*** Completed epoch {} ***", i);
 
+        logger.info(network.evaluateString("Test").toString());
+        logger.info(network.evaluateString("Penis").toString());
+
         // logger.info("Evaluate model....");
         // Evaluation eval = network.evaluate(evaluationData);
         // logger.info(eval.stats());

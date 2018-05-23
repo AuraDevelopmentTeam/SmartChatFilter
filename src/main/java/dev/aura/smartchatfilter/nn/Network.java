@@ -131,7 +131,7 @@ public class Network {
                 .build())
         .layer(
             2,
-            new RnnOutputLayer.Builder(LossFunction.MCXENT)
+            new RnnOutputLayer.Builder(LossFunction.MSE)
                 .activation(Activation.SIGMOID)
                 .nIn(hiddenLayerCount)
                 .nOut(MessageRating.SCORES_COUNT)
