@@ -86,7 +86,8 @@ public class NetworkTrainer {
                   .put("Bitch", new MessageRating(0, .9, .8))
                   .putAll(getMap())
                   .build());
-      //final StringIterator evaluationData = new StringIterator("Test", new MessageRating(0, 0, 0));
+      // final StringIterator evaluationData = new StringIterator("Test", new MessageRating(0, 0,
+      // 0));
 
       logger.info("Train model....");
 
